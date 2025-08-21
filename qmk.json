@@ -1,4 +1,9 @@
 {
-    "userspace_version": "1.0",
-    "build_targets": []
+    "userspace_version": "1.1",
+    "build_targets": [
+        ["ai03/lily", "pppp"],
+        ["hineybush/h60", "pppp"],
+        ["ymdk/yd60mq/16led", "pppp"],
+        ["dztech/tofu60", "pppp"]
+    ]
 }
