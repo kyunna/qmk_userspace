@@ -94,6 +94,45 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     }
 }
 
+/* Flow Tap customization for our specific keys */
+bool is_flow_tap_key(uint16_t keycode) {
+    /* Disable Flow Tap when modifiers are already active (hotkey prevention) */
+    if ((get_mods() & (MOD_MASK_CG | MOD_BIT_LALT)) != 0) {
+        return false;
+    }
+
+    switch (get_tap_keycode(keycode)) {
+        case KC_SPC:        // For SPC_FN
+        case KC_CAPS:       // For MAC_CAPS
+        case KC_LNG1:       // For WIN_CAPS
+        case KC_A ... KC_Z:
+        case KC_DOT:
+        case KC_COMM:
+        case KC_SCLN:
+        case KC_SLSH:
+            return true;
+    }
+    return false;
+}
+
+/* Per-key Flow Tap timing optimization */
+uint16_t get_flow_tap_term(uint16_t keycode, keyrecord_t* record, uint16_t prev_keycode) {
+    if (is_flow_tap_key(keycode) && is_flow_tap_key(prev_keycode)) {
+        switch (keycode) {
+            case MAC_CAPS:
+            case WIN_CAPS:
+                return FLOW_TAP_TERM - 25;  // 100ms - CAPS: faster Ctrl access
+
+            case SPC_FN:
+                return FLOW_TAP_TERM + 25;  // 150ms - SPACE: safer typing flow
+
+            default:
+                return FLOW_TAP_TERM;       // 125ms - Default for other keys
+        }
+    }
+    return 0;  // Disable Flow Tap
+}
+
 /* Defines combo keys (pressing two keys at once produces a third key). */
 const uint16_t PROGMEM df_combo[]  = {KC_D, KC_F, COMBO_END};
 const uint16_t PROGMEM jk_combo[]  = {KC_J, KC_K, COMBO_END};
